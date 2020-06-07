@@ -1,0 +1,46 @@
+PODS:
+  - BoringSSL-GRPC (0.0.4):
+    - BoringSSL-GRPC/Implementation (= 0.0.4)
+    - BoringSSL-GRPC/Interface (= 0.0.4)
+  - BoringSSL-GRPC/Implementation (0.0.4):
+    - BoringSSL-GRPC/Interface (= 0.0.4)
+  - BoringSSL-GRPC/Interface (0.0.4)
+  - CryptoSwift (1.3.1)
+  - gRPC-Core (1.24.2):
+    - gRPC-Core/Implementation (= 1.24.2)
+    - gRPC-Core/Interface (= 1.24.2)
+  - gRPC-Core/Implementation (1.24.2):
+    - BoringSSL-GRPC (= 0.0.4)
+    - gRPC-Core/Interface (= 1.24.2)
+  - gRPC-Core/Interface (1.24.2)
+  - Rasat (2.0.0)
+  - SwiftGRPC (0.11.0):
+    - gRPC-Core (~> 1.24.1)
+    - SwiftProtobuf (~> 1.7.0)
+  - SwiftProtobuf (1.7.0)
+
+DEPENDENCIES:
+  - CryptoSwift
+  - Rasat
+  - SwiftGRPC
+
+SPEC REPOS:
+  trunk:
+    - BoringSSL-GRPC
+    - CryptoSwift
+    - gRPC-Core
+    - Rasat
+    - SwiftGRPC
+    - SwiftProtobuf
+
+SPEC CHECKSUMS:
+  BoringSSL-GRPC: b8d2e9fca6d3870aec81ee7d583869caec2a6076
+  CryptoSwift: f12f037f6d0fcd6d48c96db0071b653de64e6c4d
+  gRPC-Core: 5ca379163f100dfbc55214942ab7d23423513a17
+  Rasat: 470a9d7464b31d294dca764634b7ff8cdf756083
+  SwiftGRPC: daeb5abeec734ee2a09072aed3fca1c2341a4869
+  SwiftProtobuf: 4fd9645e69b72cbae6ec8da5be0cdd20ca6565dd
+
+PODFILE CHECKSUM: af4bf412f4abc2c8129aa5ff2b9a7dee10c60917
+
+COCOAPODS: 1.9.2
