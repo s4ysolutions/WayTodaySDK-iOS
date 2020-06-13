@@ -9,7 +9,7 @@
 import CoreLocation
 import Rasat
 
-enum LocationServiceStatus : Int32 {
+public enum LocationServiceStatus : Int32 {
   case unknown
   case disabled
   case needAuthorization
@@ -18,7 +18,7 @@ enum LocationServiceStatus : Int32 {
   case problem
 }
 
-protocol LocationService {
+public protocol LocationService {
   var status: LocationServiceStatus {get}
   var observableStatus: Observable<LocationServiceStatus> {get}
   var observableLocation: Observable<CLLocation> {get}

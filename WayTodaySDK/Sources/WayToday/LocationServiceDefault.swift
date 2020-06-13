@@ -8,10 +8,10 @@
 import Rasat
 import CoreLocation
 
-class LocationServiceDefault: NSObject, LocationService{
+public class LocationServiceDefault: NSObject, LocationService{
     
     private static var _shared: LocationService?
-    static func shared(log: Log, wayTodayState: WayTodayState) -> LocationService {
+    public static func shared(log: Log, wayTodayState: WayTodayState) -> LocationService {
         if (_shared == nil) {
             _shared = LocationServiceDefault(log: log, wayTodayState: wayTodayState)
         }
@@ -30,21 +30,21 @@ class LocationServiceDefault: NSObject, LocationService{
         
         func locationManager(_ manager:CLLocationManager, didUpdateLocations locations: [CLLocation]) {
             if (locations.count > 0) {
-                log.debug("LocationServiceDefault: new location")
+                log.debug("LocationServiceDefault got new location")
                 channelLocation.broadcast(locations.last!)
             }
         }
         
         func locationManager(_ manager: CLLocationManager,
                              didChangeAuthorization status: CLAuthorizationStatus) {
-            log.debug("LocationServiceDefault: authorization status changed")
+            log.debug("LocationServiceDefault authorization status changed")
             locationService.stop()
             locationService.start()
         }
     }
     
     private var locationManagerDelegate: LocationDelegate?
-    var observableLocation: Observable<CLLocation> {
+    public var observableLocation: Observable<CLLocation> {
         get{
             return locationManagerDelegate!.channelLocation.observable
         }
@@ -56,14 +56,14 @@ class LocationServiceDefault: NSObject, LocationService{
     private let manager = CLLocationManager()
     
     private var _status: LocationServiceStatus = .unknown
-    var status: LocationServiceStatus {
+    public var status: LocationServiceStatus {
         get {
             return _status
         }
     }
     
     let _channelStatus = Channel<LocationServiceStatus> ()
-    var observableStatus: Observable<LocationServiceStatus> {
+    public var observableStatus: Observable<LocationServiceStatus> {
         get{
             return _channelStatus.observable
         }
@@ -74,12 +74,7 @@ class LocationServiceDefault: NSObject, LocationService{
         self.wayTodayState = wayTodayState
         super.init()
         locationManagerDelegate = LocationDelegate(locationService: self, log: log)
-        
-        if wayTodayState.on {
-            start()
-        } else {
-            stop()
-        }
+        self.log.debug("LocationServiceDefault init with on=\(wayTodayState.on)")
         startObserveState()
     }
     
@@ -87,39 +82,46 @@ class LocationServiceDefault: NSObject, LocationService{
         stopObserveState()
     }
     
-    internal func start() {
+    public func start() {
         manager.delegate = locationManagerDelegate
         
         if (_status == .started) {
+            self.log.debug("LocationServiceDefault already started")
             return
         }
+        
+        self.log.debug("LocationServiceDefault starting")
         if (!CLLocationManager.locationServicesEnabled()){
+            self.log.debug("LocationServiceDefault start aborted because CLLocationManager")
             _status = .disabled
             _channelStatus.broadcast(.disabled)
             return
         }
+        
         let authStatus: CLAuthorizationStatus = CLLocationManager.authorizationStatus()
         if authStatus != CLAuthorizationStatus.authorizedAlways {
             _status = .needAuthorization
+            self.log.debug("LocationServiceDefault start requests authorization")
             _channelStatus.broadcast(.needAuthorization)
             return
         }
         
         manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+        manager.distanceFilter = 5
         manager.pausesLocationUpdatesAutomatically = true
-        // manager.desiredAccuracy = kCLLocationAccuracyBest
+        manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation //kCLLocationAccuracyBest
         manager.allowsBackgroundLocationUpdates = true
         manager.startUpdatingLocation()
         _status = .started
         _channelStatus.broadcast(.started)
-        self.log.debug("Location Service started")
+        self.log.debug("LocationServiceDefault started")
     }
     
-    internal func stop() {
+    public func stop() {
         manager.stopUpdatingLocation()
         _status = .stopped
         _channelStatus.broadcast(_status)
-        log.debug("Location Service stopped")
+        log.debug("LocationServiceDefault stopped")
     }
     
     private func startObserveState() {

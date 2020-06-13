@@ -6,9 +6,9 @@
 //  Copyright © 2019 S4Y Solutions. All rights reserved.
 //
 
-protocol Log {
-  func debug(_ msg: StaticString)
-  func debug(_ msg: StaticString, _ args: CVarArg...)
-  func error(_ msg: StaticString)
-  func error(_ msg: StaticString, _ args: CVarArg...)
+public protocol Log {
+  func debug(_ msg: String)
+  func debug(format: String, _ args: CVarArg...)
+  func error(_ msg: String)
+  func error(format: String, _ args: CVarArg...)
 }

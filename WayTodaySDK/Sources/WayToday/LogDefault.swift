@@ -8,31 +8,31 @@
 
 import os
 
-class LogDefault: Log {
-  private static let _shared = LogDefault()
-//  private let logGeneral = OSLog(subsystem: "s4y.solutions.waytoday", category: "general")
-
-  static var shared: Log {
-    get {
-      return _shared
+public class LogDefault: Log {
+    private static let _shared = LogDefault()
+    
+    public static var shared: Log {
+        get {
+            return _shared
+        }
     }
-  }
-
-  func debug(_ msg: StaticString) {
-    os_log(msg, log: OSLog.default, type: .debug)
-  }
-
-  func debug(_ msg: StaticString, _ args: CVarArg...) {
-    os_log(msg, log: OSLog.default, type: .debug, args)
-  }
-
-
-  func error(_ msg: StaticString) {
-    os_log(msg, log: OSLog.default, type: .error)
-  }
-
-  func error(_ msg: StaticString, _ args: CVarArg...) {
-    os_log(msg, log: OSLog.default, type: .error, args)
-  }
-
+    
+    public func debug(_ msg: String) {
+        os_log("WayToday: %s", log: OSLog.default, type: .debug, msg)
+    }
+    
+    public func debug(format: String, _ args: CVarArg...) {
+        let m = String(format: format, args)
+        os_log("WayToday: %s", log: OSLog.default, type: .debug, m)
+    }
+    
+    public func error(_ msg: String) {
+        os_log("WayToday: %s", log: OSLog.default, type: .error, msg)
+    }
+    
+    public func error(format: String, _ args: CVarArg...) {
+        let m = String(format: format, args)
+        os_log("WayToday: %s", log: OSLog.default, type: .error, m)
+    }
+    
 }

@@ -9,54 +9,52 @@
 import Rasat
 import UIKit
 
-class WayTodayStateDefault: WayTodayState {
-  static let _shared = WayTodayStateDefault()
-  static var shared: WayTodayState {
-    get { return _shared}
-  }
-
-  private let _subjectOn = Subject<Bool>(UserDefaults.standard.bool(forKey: "on"))
-  var observableOn: Observable<Bool> {
-    get {
-      print("get state observable")
-      return _subjectOn.observable
+public class WayTodayStateDefault: WayTodayState {
+    static let _shared = WayTodayStateDefault()
+    public static var shared: WayTodayState {
+        get { return _shared}
     }
-  }
-
-  var on: Bool {
-    get {
-      return _subjectOn.value
+    
+    private let _subjectOn = Subject<Bool>(UserDefaults.standard.bool(forKey: "on"))
+    public var observableOn: Observable<Bool> {
+        get {
+            return _subjectOn.observable
+        }
     }
-    set(on) {
-      UserDefaults.standard.set(on, forKey: "on")
-      _subjectOn.value=on
+    
+    public var on: Bool {
+        get {
+            return _subjectOn.value
+        }
+        set(on) {
+            UserDefaults.standard.set(on, forKey: "on")
+            _subjectOn.value=on
+        }
     }
-  }
-
-  var soundOn: Bool {
-    get {
-      return UserDefaults.standard.bool(forKey: "sndon")
+    
+    public var soundOn: Bool {
+        get {
+            return UserDefaults.standard.bool(forKey: "sndon")
+        }
+        set(on) {
+            UserDefaults.standard.set(on, forKey: "sndon")
+        }
     }
-    set(on) {
-      UserDefaults.standard.set(on, forKey: "sndon")
+    
+    var first = true
+    var _tid: String = ""
+    public var tid: String {
+        get {
+            if (_tid == "") {
+                _tid = UserDefaults.standard.string(forKey: "tid") ?? ""
+            }
+            return _tid
+        }
+        
+        set(tid) {
+            _tid = tid
+            UserDefaults.standard.set(tid, forKey: "tid")
+        }
     }
-  }
-
-  var first = true
-  var _tid: String = ""
-  var tid: String {
-    get {
-      if (_tid == "") {
-        _tid = UserDefaults.standard.string(forKey: "tid") ?? ""
-      }
-      return _tid
-    }
-
-    set(tid) {
-      _tid = tid
-      UserDefaults.standard.set(tid, forKey: "tid")
-    }
-  }
-
-
+    
 }

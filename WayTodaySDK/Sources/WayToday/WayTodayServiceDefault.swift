@@ -9,12 +9,12 @@
 import CoreLocation
 import Foundation
 
-class WayTodayServiceDefault: WayTodayService {
+public class WayTodayServiceDefault: WayTodayService {
     private static var _shared: WayTodayService?
     private let appname: String
     private let secret: String
     
-    static func shared(log: Log, wayTodayState: WayTodayState, appname: String, secret: String) -> WayTodayService{
+    public static func shared(log: Log, wayTodayState: WayTodayState, appname: String, secret: String) -> WayTodayService{
         if (_shared == nil) {
             _shared = WayTodayServiceDefault(
                 address: "tracker.way.today:9101",
@@ -39,7 +39,7 @@ class WayTodayServiceDefault: WayTodayService {
         client = Grpc_TrackerServiceClient(address: address, secure: true)
     }
     
-    func ping(payload: String) throws {
+    public func ping(payload: String) throws {
         var request = Grpc_PingRequest()
         request.payload = payload
         try client.ping(request, completion: {(response, result) in
@@ -47,7 +47,7 @@ class WayTodayServiceDefault: WayTodayService {
         })
     }
     
-    func generateTid(prevTid: String, complete: @escaping (_ tid: String) -> Void) throws{
+    public func generateTid(prevTid: String, complete: @escaping (_ tid: String) -> Void) throws{
         //    log.debug("WayTodayService issue generateTid, prevID=\"%s\"", _prevTid)
         log.debug("WayTodayService issue generateTid")
         var request = Grpc_GenerateTrackerIDRequest()
@@ -66,7 +66,7 @@ class WayTodayServiceDefault: WayTodayService {
         })
     }
     
-    func addLocation(tid: String, longitude: CLLocationDegrees, latitude: CLLocationDegrees, complete: @escaping ()->Void) throws {
+    public func addLocation(tid: String, longitude: CLLocationDegrees, latitude: CLLocationDegrees, complete: @escaping ()->Void) throws {
         var location = Models_Location()
         location.lat = Int64(lround(latitude * 10000000))
         location.lon = Int64(lround(longitude * 10000000))

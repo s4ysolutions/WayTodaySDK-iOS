@@ -8,13 +8,13 @@
 
 import Rasat
 
-enum UploaderState {
+public enum UploaderState {
   case IDLE
   case UPLOADING
   case ERROR
 }
 
-protocol Uploader {
+public protocol Uploader {
   var observableState: Observable<UploaderState> {get}
   func startListen(locationService: LocationService, wayTodayService: WayTodayService) throws
   func stopListen()
