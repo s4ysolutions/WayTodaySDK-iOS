@@ -22,6 +22,7 @@ public class LocationServiceDefault: NSObject, LocationService{
         let channelLocation = Channel<CLLocation>()
         let log: Log
         let locationService: LocationService
+        var lastLocation: CLLocation? = nil
         
         init(locationService: LocationService, log: Log) {
             self.locationService = locationService
@@ -31,7 +32,8 @@ public class LocationServiceDefault: NSObject, LocationService{
         func locationManager(_ manager:CLLocationManager, didUpdateLocations locations: [CLLocation]) {
             if (locations.count > 0) {
                 log.debug("LocationServiceDefault got new location")
-                channelLocation.broadcast(locations.last!)
+                lastLocation = locations.last!
+                channelLocation.broadcast(lastLocation!)
             }
         }
         
@@ -66,6 +68,12 @@ public class LocationServiceDefault: NSObject, LocationService{
     public var observableStatus: Observable<LocationServiceStatus> {
         get{
             return _channelStatus.observable
+        }
+    }
+    
+    public var lastLocation: CLLocation? {
+        get {
+            return locationManagerDelegate?.lastLocation
         }
     }
     

@@ -22,6 +22,7 @@ public protocol LocationService {
   var status: LocationServiceStatus {get}
   var observableStatus: Observable<LocationServiceStatus> {get}
   var observableLocation: Observable<CLLocation> {get}
+  var lastLocation: CLLocation? {get}
   func start()
   func stop()
 }
