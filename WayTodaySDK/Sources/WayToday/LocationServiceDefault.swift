@@ -108,7 +108,7 @@ public class LocationServiceDefault: NSObject, LocationService{
         
         manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
         manager.distanceFilter = 5
-        manager.pausesLocationUpdatesAutomatically = true
+        manager.pausesLocationUpdatesAutomatically = false
         manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation //kCLLocationAccuracyBest
         manager.allowsBackgroundLocationUpdates = true
         manager.startUpdatingLocation()
