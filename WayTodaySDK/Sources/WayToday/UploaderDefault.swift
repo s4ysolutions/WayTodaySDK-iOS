@@ -47,25 +47,27 @@ public class UploaderDefault: Uploader {
         log.debug("UpdateDefault: start listen")
         disposeBag!.add(
             locationService.observableLocation.subscribe(id: "uploader", handler: {location in
-                if (self.wayTodayState.tid != "") {
-                    self.log.debug("UpdateDefault: broadcast uploading")
-                    self.channelState.broadcast(UploaderState.UPLOADING)
-                    let coordinate = location.coordinate
-                    do {
-                        try wayTodayService.addLocation(
-                            tid: self.wayTodayState.tid,
-                            longitude: coordinate.longitude,
-                            latitude: coordinate.latitude,
-                            complete: {
-                                self.log.debug("UpdateDefault: broadcast idle")
-                                self.channelState.broadcast(UploaderState.IDLE)
-                        })
-                    }catch{
-                        self.log.debug("UpdateDefault: broadcast error")
-                        self.channelState.broadcast(UploaderState.ERROR)
+                if self.wayTodayState.on {
+                    if (self.wayTodayState.tid != "") {
+                        self.log.debug("UpdateDefault: broadcast uploading")
+                        self.channelState.broadcast(UploaderState.UPLOADING)
+                        let coordinate = location.coordinate
+                        do {
+                            try wayTodayService.addLocation(
+                                tid: self.wayTodayState.tid,
+                                longitude: coordinate.longitude,
+                                latitude: coordinate.latitude,
+                                complete: {
+                                    self.log.debug("UpdateDefault: broadcast idle")
+                                    self.channelState.broadcast(UploaderState.IDLE)
+                            })
+                        }catch{
+                            self.log.debug("UpdateDefault: broadcast error")
+                            self.channelState.broadcast(UploaderState.ERROR)
+                        }
+                    }else{
+                        self.log.debug("UpdateDefault: upload skipped, no tid")
                     }
-                }else{
-                    self.log.debug("UpdateDefault: upload skipped, no tid")
                 }
             })
         )
