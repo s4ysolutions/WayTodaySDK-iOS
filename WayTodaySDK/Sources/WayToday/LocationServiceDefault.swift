@@ -8,6 +8,23 @@
 import Rasat
 import CoreLocation
 
+func CLAuthorizationStatus2LocationServiceAuthorizationStatus(_ status: CLAuthorizationStatus) -> LocationServiceAuthorizationStatus {
+    switch status {
+    case .authorizedAlways:
+        return .Authorized
+    case .notDetermined:
+        return .unknown
+    case .restricted:
+        return .needAuthorization
+    case .denied:
+        return .needAuthorization
+    case .authorizedWhenInUse:
+        return .needAuthorization
+    @unknown default:
+        return .needAuthorization
+    }
+}
+
 public class LocationServiceDefault: NSObject, LocationService{
     
     private static var _shared: LocationService?
@@ -20,6 +37,7 @@ public class LocationServiceDefault: NSObject, LocationService{
     
     private class LocationDelegate: NSObject, CLLocationManagerDelegate {
         let channelLocation = Channel<CLLocation>()
+        let channelAuthorization = Channel<LocationServiceAuthorizationStatus>()
         let log: Log
         let locationService: LocationService
         var lastLocation: CLLocation? = nil
@@ -40,15 +58,21 @@ public class LocationServiceDefault: NSObject, LocationService{
         func locationManager(_ manager: CLLocationManager,
                              didChangeAuthorization status: CLAuthorizationStatus) {
             log.debug("LocationServiceDefault authorization status changed")
-            locationService.stop()
-            locationService.start()
+            channelAuthorization.broadcast(CLAuthorizationStatus2LocationServiceAuthorizationStatus(status))
         }
     }
     
-    private var locationManagerDelegate: LocationDelegate?
+    private var locationManagerDelegate: LocationDelegate!
+    
     public var observableLocation: Observable<CLLocation> {
         get{
-            return locationManagerDelegate!.channelLocation.observable
+            return locationManagerDelegate.channelLocation.observable
+        }
+    }
+    
+    public var observableAuthorizationStatus: Observable<LocationServiceAuthorizationStatus> {
+        get{
+            return locationManagerDelegate.channelAuthorization.observable
         }
     }
     
@@ -56,11 +80,17 @@ public class LocationServiceDefault: NSObject, LocationService{
     private let log: Log
     private let wayTodayState: WayTodayState
     private let manager = CLLocationManager()
-    
+  
     private var _status: LocationServiceStatus = .unknown
     public var status: LocationServiceStatus {
         get {
             return _status
+        }
+    }
+    
+    public var authorizationStatus: LocationServiceAuthorizationStatus {
+        get {
+            return CLAuthorizationStatus2LocationServiceAuthorizationStatus(CLLocationManager.authorizationStatus())
         }
     }
     
@@ -73,7 +103,7 @@ public class LocationServiceDefault: NSObject, LocationService{
     
     public var lastLocation: CLLocation? {
         get {
-            return locationManagerDelegate?.lastLocation
+            return locationManagerDelegate.lastLocation
         }
     }
     
@@ -108,9 +138,8 @@ public class LocationServiceDefault: NSObject, LocationService{
         
         let authStatus: CLAuthorizationStatus = CLLocationManager.authorizationStatus()
         if authStatus != CLAuthorizationStatus.authorizedAlways {
-            _status = .needAuthorization
             self.log.debug("LocationServiceDefault start requests authorization")
-            _channelStatus.broadcast(.needAuthorization)
+            locationManagerDelegate.channelAuthorization.broadcast(.needAuthorization)
             return
         }
         
@@ -149,5 +178,9 @@ public class LocationServiceDefault: NSObject, LocationService{
         subscriptionOn?.dispose()
         subscriptionOn = nil
         log.debug("LocationServiceDefault unsubscribed from WayToday state")
+    }
+    
+    public func requestAuthorization() {
+        manager.requestAlwaysAuthorization()
     }
 }
