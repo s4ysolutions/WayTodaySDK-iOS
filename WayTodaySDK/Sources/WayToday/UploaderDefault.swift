@@ -41,6 +41,9 @@ public class UploaderDefault: Uploader {
         stopListen()
     }
     
+    private var prevLat: CLLocationDegrees = 0
+    private var prevLon: CLLocationDegrees = 0
+    
     public func startListen(locationService: LocationService, wayTodayService: WayTodayService) throws {
         disposeBag?.dispose()
         disposeBag = DisposeBag()
@@ -48,15 +51,17 @@ public class UploaderDefault: Uploader {
         disposeBag!.add(
             locationService.observableLocation.subscribe(id: "uploader", handler: {location in
                 if self.wayTodayState.on {
-                    if (self.wayTodayState.tid != "") {
+                    let coordinate = location.coordinate
+                    if (self.wayTodayState.tid != "" && abs(coordinate.longitude) < 0.0001 && abs(coordinate.latitude) < 85 && abs(coordinate.longitude - self.prevLon)>0.0001 && abs(coordinate.latitude - self.prevLat) > 0.000_1) {
                         self.log.debug("UpdateDefault: broadcast uploading")
                         self.channelState.broadcast(UploaderState.UPLOADING)
-                        let coordinate = location.coordinate
+                        
                         do {
                             try wayTodayService.addLocation(
                                 tid: self.wayTodayState.tid,
                                 longitude: coordinate.longitude,
                                 latitude: coordinate.latitude,
+                                timestamp: UInt64(location.timestamp.timeIntervalSince1970),
                                 complete: {
                                     self.log.debug("UpdateDefault: broadcast idle")
                                     self.channelState.broadcast(UploaderState.IDLE)
