@@ -71,12 +71,6 @@ public class LocationServiceDefault: NSObject, LocationService{
         }
     }
     
-    public var observableAuthorizationStatus: Observable<LocationServiceAuthorizationStatus> {
-        get{
-            return locationManagerDelegate.channelAuthorization.observable
-        }
-    }
-    
     private var disposeBag: DisposeBag?
     private let log: Log
     private let wayTodayState: WayTodayState

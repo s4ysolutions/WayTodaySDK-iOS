@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "WayTodaySDK"
-  s.version      = "1.0.17"
+  s.version      = "1.0.18"
   s.summary      = "WayToday integration SDK."
   s.description  = <<-DESC
                     WayTodaySDK contains set of interfaces to update Track ID and locations of WayToday online service.

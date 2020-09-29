@@ -27,7 +27,6 @@ public enum LocationServiceAuthorizationStatus : Int32 {
 public protocol LocationService {
   var authorizationStatus: LocationServiceAuthorizationStatus {get}
   var status: LocationServiceStatus {get}
-  var observableAuthorizationStatus: Observable<LocationServiceAuthorizationStatus> {get}
   var observableStatus: Observable<LocationServiceStatus> {get}
   var observableLocation: Observable<CLLocation> {get}
   var lastLocation: CLLocation? {get}
