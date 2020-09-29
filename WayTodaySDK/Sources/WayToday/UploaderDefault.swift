@@ -52,7 +52,7 @@ public class UploaderDefault: Uploader {
             locationService.observableLocation.subscribe(id: "uploader", handler: {location in
                 if self.wayTodayState.on {
                     let coordinate = location.coordinate
-                    if (self.wayTodayState.tid != "" && abs(coordinate.longitude) < 0.0001 && abs(coordinate.latitude) < 85 && abs(coordinate.longitude - self.prevLon)>0.0001 && abs(coordinate.latitude - self.prevLat) > 0.000_1) {
+                    if (self.wayTodayState.tid != "" && abs(coordinate.longitude) > 0.0001 && abs(coordinate.latitude) < 85 && abs(coordinate.longitude - self.prevLon)>0.0001 && abs(coordinate.latitude - self.prevLat) > 0.0001) {
                         self.log.debug("UpdateDefault: broadcast uploading")
                         self.channelState.broadcast(UploaderState.UPLOADING)
                         
