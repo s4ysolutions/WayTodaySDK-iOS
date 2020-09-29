@@ -9,8 +9,8 @@
 import Rasat
 
 public protocol WayTodayState {
-  var on: Bool {get set}
-  var observableOn: Observable<Bool> {get}
-  var soundOn: Bool {get set}
-  var tid: String {get set}
+    var on: Bool {get set}
+    var observableOn: Observable<Bool> {get}
+    var soundOn: Bool {get set}
+    var tid: String {get set}
 }

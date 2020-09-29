@@ -15,20 +15,23 @@ public class WayTodayStateDefault: WayTodayState {
         get { return _shared}
     }
     
-    private let _subjectOn = Subject<Bool>(UserDefaults.standard.bool(forKey: "on"))
+    private var _on = UserDefaults.standard.bool(forKey: "on")
+    
+    private let _channelOn: Channel<Bool> = Channel<Bool>()
+    
     public var observableOn: Observable<Bool> {
         get {
-            return _subjectOn.observable
+            return _channelOn.observable
         }
-    }
-    
+    }    
     public var on: Bool {
         get {
-            return _subjectOn.value
+            return _on
         }
         set(on) {
             UserDefaults.standard.set(on, forKey: "on")
-            _subjectOn.value=on
+            _on = on
+            _channelOn.broadcast(_on)
         }
     }
     

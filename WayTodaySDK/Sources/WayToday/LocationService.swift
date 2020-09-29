@@ -12,6 +12,7 @@ import Rasat
 public enum LocationServiceStatus : Int32 {
   case unknown
   case disabled
+  case needAuthorization
   case stopped
   case started
   case problem

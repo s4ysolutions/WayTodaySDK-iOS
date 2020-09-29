@@ -30,6 +30,7 @@ public class LocationServiceDefault: NSObject, LocationService{
     private static var _shared: LocationService?
     public static func shared(log: Log, wayTodayState: WayTodayState) -> LocationService {
         if (_shared == nil) {
+            log.debug("LocationServiceDefault getting shared")
             _shared = LocationServiceDefault(log: log, wayTodayState: wayTodayState)
         }
         return _shared!
@@ -49,7 +50,7 @@ public class LocationServiceDefault: NSObject, LocationService{
         
         func locationManager(_ manager:CLLocationManager, didUpdateLocations locations: [CLLocation]) {
             if (locations.count > 0) {
-                log.debug("LocationServiceDefault got new location")
+                log.debug("LocationDelegate got new location")
                 lastLocation = locations.last!
                 channelLocation.broadcast(lastLocation!)
             }
@@ -57,7 +58,7 @@ public class LocationServiceDefault: NSObject, LocationService{
         
         func locationManager(_ manager: CLLocationManager,
                              didChangeAuthorization status: CLAuthorizationStatus) {
-            log.debug("LocationServiceDefault authorization status changed")
+            log.debug("LocationDelegate authorization status changed \(status.rawValue)")
             channelAuthorization.broadcast(CLAuthorizationStatus2LocationServiceAuthorizationStatus(status))
         }
     }
@@ -76,7 +77,7 @@ public class LocationServiceDefault: NSObject, LocationService{
         }
     }
     
-    private var subscriptionOn: Disposable?
+    private var disposeBag: DisposeBag?
     private let log: Log
     private let wayTodayState: WayTodayState
     private let manager = CLLocationManager()
@@ -90,7 +91,9 @@ public class LocationServiceDefault: NSObject, LocationService{
     
     public var authorizationStatus: LocationServiceAuthorizationStatus {
         get {
-            return CLAuthorizationStatus2LocationServiceAuthorizationStatus(CLLocationManager.authorizationStatus())
+            let ast = CLAuthorizationStatus2LocationServiceAuthorizationStatus(CLLocationManager.authorizationStatus())
+            log.debug(format: "LocationServiceDefault authorization status is \(ast)")
+            return ast
         }
     }
     
@@ -114,6 +117,13 @@ public class LocationServiceDefault: NSObject, LocationService{
         locationManagerDelegate = LocationDelegate(locationService: self, log: log)
         self.log.debug("LocationServiceDefault init with on=\(wayTodayState.on)")
         startObserveState()
+        if wayTodayState.on && authorizationStatus == .Authorized {
+            log.debug("LocationServiceDefault started on init")
+            start()
+        } else {
+            log.debug("LocationServiceDefault stopped on init")
+            stop()
+        }
     }
     
     deinit {
@@ -138,8 +148,9 @@ public class LocationServiceDefault: NSObject, LocationService{
         
         let authStatus: CLAuthorizationStatus = CLLocationManager.authorizationStatus()
         if authStatus != CLAuthorizationStatus.authorizedAlways {
-            self.log.debug("LocationServiceDefault start requests authorization")
-            locationManagerDelegate.channelAuthorization.broadcast(.needAuthorization)
+            self.log.debug("LocationServiceDefault start requests authorization during start")
+            _status = .needAuthorization
+            _channelStatus.broadcast(.needAuthorization)
             return
         }
         
@@ -162,22 +173,41 @@ public class LocationServiceDefault: NSObject, LocationService{
     }
     
     private func startObserveState() {
+        assert(disposeBag==nil)
+        disposeBag = DisposeBag()
         log.debug("LocationServiceDefault will subscribe to WayToday state")
-        assert(subscriptionOn==nil)
-        subscriptionOn = wayTodayState.observableOn.subscribe(id: "lsd", handler: {on in
+        disposeBag!.add(wayTodayState.observableOn.subscribe(id: "lsd", handler: {on in
             if on {
                 self.start()
             } else {
                 self.stop()
             }
-        })
+        }))
         self.log.debug("LocationServiceDefault subscribed to WayToday state")
+        log.debug("LocationServiceDefault will subscribe to locationManagerDelegate authorization requests")
+        disposeBag!.add(locationManagerDelegate.channelAuthorization.observable.subscribe(id: "lmd", handler: {status in
+            if status != .Authorized {
+                self.log.debug("LocationServiceDefault start requests authorization on change authorization status")
+                self._status = .needAuthorization
+                self._channelStatus.broadcast(self._status)
+            } else if (self._status == .needAuthorization) {
+                // in order to update status and UI
+                if self.wayTodayState.on {
+                    self.log.debug("LocationServiceDefault will start on authorization enabled")
+                    self.start()
+                } else {
+                    self.log.debug("LocationServiceDefault will stop although authorization enabled")
+                    self.stop()
+                }
+            }
+        }))
+        self.log.debug("LocationServiceDefault subscribed to locationManagerDelegate authorization requests")
     }
     
     private func stopObserveState() {
-        subscriptionOn?.dispose()
-        subscriptionOn = nil
-        log.debug("LocationServiceDefault unsubscribed from WayToday state")
+        disposeBag?.dispose()
+        disposeBag = nil
+        log.debug("LocationServiceDefault unsubscribed from WayToday state and locationManagerDelegate authorization requests"  )
     }
     
     public func requestAuthorization() {

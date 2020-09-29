@@ -54,6 +54,8 @@ public class UploaderDefault: Uploader {
                     let coordinate = location.coordinate
                     if (self.wayTodayState.tid != "" && abs(coordinate.longitude) > 0.0001 && abs(coordinate.latitude) < 85 && abs(coordinate.longitude - self.prevLon)>0.0001 && abs(coordinate.latitude - self.prevLat) > 0.0001) {
                         self.log.debug("UpdateDefault: broadcast uploading")
+                        self.prevLat = coordinate.latitude
+                        self.prevLon = coordinate.longitude
                         self.channelState.broadcast(UploaderState.UPLOADING)
                         
                         do {
