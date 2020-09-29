@@ -14,14 +14,16 @@ public class WayTodayServiceDefault: WayTodayService {
     private static var _shared: WayTodayService?
     private let appname: String
     private let secret: String
+    private let provider: String
+
     
-    public static func shared(log: Log, wayTodayState: WayTodayState, appname: String, secret: String) -> WayTodayService{
+    public static func shared(log: Log, wayTodayState: WayTodayState, appname: String, secret: String, provider: String) -> WayTodayService{
         if (_shared == nil) {
             _shared = WayTodayServiceDefault(
                 address: "tracker.way.today:9101",
                 log: log,
                 wayTodayState: wayTodayState,
-                appname: appname, secret: secret
+                appname: appname, secret: secret, provider: provider
             )
         }
         return _shared!
@@ -31,9 +33,10 @@ public class WayTodayServiceDefault: WayTodayService {
     private let log: Log
     private let wayTodayState: WayTodayState
     
-    init(address: String, log: Log, wayTodayState: WayTodayState, appname: String, secret: String){
+    init(address: String, log: Log, wayTodayState: WayTodayState, appname: String, secret: String, provider: String){
         self.appname = appname
         self.secret = secret
+        self.provider = provider
         
         self.log = log
         self.wayTodayState = wayTodayState
@@ -71,7 +74,7 @@ public class WayTodayServiceDefault: WayTodayService {
         var location = Models_Location()
         location.lat = Int64(lround(latitude * 10000000))
         location.lon = Int64(lround(longitude * 10000000))
-        location.provider = "iTagOneIOS"
+        location.provider = provider
         location.sid = UUID.init().uuidString
         location.ts = timestamp
         var request = Grpc_AddLocationsRequest()
