@@ -70,7 +70,7 @@ public class WayTodayServiceDefault: WayTodayService {
         })
     }
     
-    public func addLocation(tid: String, longitude: CLLocationDegrees, latitude: CLLocationDegrees, timestamp: UInt64, complete: @escaping ()->Void) throws {
+    public func addLocation(tid: String, longitude: CLLocationDegrees, latitude: CLLocationDegrees, timestamp: UInt64, complete: @escaping (Bool)->Void) throws {
         var location = Models_Location()
         location.lat = Int64(lround(latitude * 10000000))
         location.lon = Int64(lround(longitude * 10000000))
@@ -81,7 +81,7 @@ public class WayTodayServiceDefault: WayTodayService {
         request.tid = wayTodayState.tid
         request.locations = [location]
         try client.addLocations(request, metadata: WSSE.grpcMetadata(appname: appname, secret: secret), completion: {(response, result) in
-            complete()
+            complete(response?.ok ?? false && result.statusCode == .ok)
         })
     }
 }

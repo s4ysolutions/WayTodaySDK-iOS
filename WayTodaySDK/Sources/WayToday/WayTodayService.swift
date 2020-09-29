@@ -11,5 +11,5 @@ import CoreLocation
 public protocol WayTodayService {
   func ping(payload: String) throws
   func generateTid(prevTid: String, complete: @escaping (_ tid: String) -> Void) throws
-    func addLocation(tid: String, longitude: CLLocationDegrees, latitude: CLLocationDegrees, timestamp: UInt64, complete: @escaping ()->Void) throws
+    func addLocation(tid: String, longitude: CLLocationDegrees, latitude: CLLocationDegrees, timestamp: UInt64, complete: @escaping (Bool)->Void) throws
 }

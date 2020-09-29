@@ -64,16 +64,17 @@ public class UploaderDefault: Uploader {
                                 longitude: coordinate.longitude,
                                 latitude: coordinate.latitude,
                                 timestamp: UInt64(location.timestamp.timeIntervalSince1970),
-                                complete: {
-                                    self.log.debug("UpdateDefault: broadcast idle")
-                                    self.channelState.broadcast(UploaderState.IDLE)
+                                complete: {ok in
+                                    let status = ok ? UploaderState.IDLE : UploaderState.ERROR
+                                    self.log.debug("UpdateDefault: broadcast \(status)")
+                                    self.channelState.broadcast(status)
                             })
                         }catch{
                             self.log.debug("UpdateDefault: broadcast error")
                             self.channelState.broadcast(UploaderState.ERROR)
                         }
                     }else{
-                        self.log.debug("UpdateDefault: upload skipped, no tid")
+                        self.log.debug("UpdateDefault: upload skipped, no tid or locations too close")
                     }
                 }
             })
