@@ -57,29 +57,33 @@ public class UploaderDefault: Uploader {
             locationService.observableLocation.subscribe(id: "uploader", handler: {location in
                 if self.wayTodayState.on {
                     let coordinate = location.coordinate
-                    if (self.wayTodayState.tid != "" && abs(coordinate.longitude) > 0.0001 && abs(coordinate.latitude) < 85 && abs(coordinate.longitude - self.prevLon)>0.0001 && abs(coordinate.latitude - self.prevLat) > 0.0001) {
-                        self.log.debug("UpdateDefault: broadcast uploading")
-                        self.prevLat = coordinate.latitude
-                        self.prevLon = coordinate.longitude
-                        self.channelState.broadcast(UploaderState.UPLOADING)
-                        
-                        do {
-                            try wayTodayService.addLocation(
-                                tid: self.wayTodayState.tid,
-                                longitude: coordinate.longitude,
-                                latitude: coordinate.latitude,
-                                timestamp: UInt64(location.timestamp.timeIntervalSince1970),
-                                complete: {ok in
-                                    let status = ok ? UploaderState.IDLE : UploaderState.ERROR
-                                    self.log.debug("UpdateDefault: broadcast \(status)")
-                                    self.channelState.broadcast(status)
-                            })
-                        }catch{
-                            self.log.debug("UpdateDefault: broadcast error")
-                            self.channelState.broadcast(UploaderState.ERROR)
+                    if self.wayTodayState.tid != "" {
+                        if abs(coordinate.longitude) > 0.0001 && abs(coordinate.latitude) < 85 && abs(coordinate.longitude - self.prevLon)>0.0001 && abs(coordinate.latitude - self.prevLat) > 0.0001 {
+                            self.log.debug("UpdateDefault: broadcast uploading")
+                            self.prevLat = coordinate.latitude
+                            self.prevLon = coordinate.longitude
+                            self.channelState.broadcast(UploaderState.UPLOADING)
+                            
+                            do {
+                                try wayTodayService.addLocation(
+                                    tid: self.wayTodayState.tid,
+                                    longitude: coordinate.longitude,
+                                    latitude: coordinate.latitude,
+                                    timestamp: UInt64(location.timestamp.timeIntervalSince1970),
+                                    complete: {ok in
+                                        let status = ok ? UploaderState.IDLE : UploaderState.ERROR
+                                        self.log.debug("UpdateDefault: broadcast \(status)")
+                                        self.channelState.broadcast(status)
+                                })
+                            }catch{
+                                self.log.debug("UpdateDefault: broadcast error")
+                                self.channelState.broadcast(UploaderState.ERROR)
+                            }
+                        }else{
+                            self.log.debug("UpdateDefault: upload skipped, locations too close")
                         }
                     }else{
-                        self.log.debug("UpdateDefault: upload skipped, no tid or locations too close")
+                        self.log.debug("UpdateDefault: upload skipped, no tid")
                     }
                 }
             })
