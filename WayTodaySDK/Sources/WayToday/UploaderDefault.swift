@@ -44,6 +44,11 @@ public class UploaderDefault: Uploader {
     private var prevLat: CLLocationDegrees = 0
     private var prevLon: CLLocationDegrees = 0
     
+    public func reset() {
+        prevLat = 0
+        prevLon = 0
+    }
+    
     public func startListen(locationService: LocationService, wayTodayService: WayTodayService) throws {
         disposeBag?.dispose()
         disposeBag = DisposeBag()

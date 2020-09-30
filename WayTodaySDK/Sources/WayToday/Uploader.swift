@@ -9,13 +9,14 @@
 import Rasat
 
 public enum UploaderState {
-  case IDLE
-  case UPLOADING
-  case ERROR
+    case IDLE
+    case UPLOADING
+    case ERROR
 }
 
 public protocol Uploader {
-  var observableState: Observable<UploaderState> {get}
-  func startListen(locationService: LocationService, wayTodayService: WayTodayService) throws
-  func stopListen()
+    var observableState: Observable<UploaderState> {get}
+    func startListen(locationService: LocationService, wayTodayService: WayTodayService) throws
+    func stopListen()
+    func reset()
 }
