@@ -111,13 +111,6 @@ public class LocationServiceDefault: NSObject, LocationService{
         locationManagerDelegate = LocationDelegate(locationService: self, log: log)
         self.log.debug("LocationServiceDefault init with on=\(wayTodayState.on)")
         startObserveState()
-        if wayTodayState.on && authorizationStatus == .Authorized {
-            log.debug("LocationServiceDefault started on init")
-            start()
-        } else {
-            log.debug("LocationServiceDefault stopped on init")
-            stop()
-        }
     }
     
     deinit {
