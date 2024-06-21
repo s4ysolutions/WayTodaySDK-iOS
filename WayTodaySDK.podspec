@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.author           = { "Sergey Dolin" => "sergey@s4y.solutions" }
 
   s.swift_version = '5.1'
-  s.ios.deployment_target     = "11.0"
+  s.ios.deployment_target     = "12.4"
 
   s.source       = { :git => "https://github.com/s4ysolutions/WayTodaySDK-iOS", :tag => "#{s.version}" }
   # s.source_files = "WayTodaySDK/Sources", "WayTodaySDK/Sources/**/*.swift"
