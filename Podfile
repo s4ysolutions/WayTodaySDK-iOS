@@ -7,9 +7,9 @@ target 'WayTodaySDK' do
   use_frameworks!
 
   # Pods for Way.Today
-  pod 'CryptoSwift'
-  pod 'Rasat'
-  pod 'SwiftGRPC'
+  pod 'CryptoSwift', '~> 1'
+  pod 'Rasat', '~> 2'
+  pod 'SwiftGRPC', '~> 0.11'
 
   target 'WayTodaySDKTests' do
     inherit! :complete
